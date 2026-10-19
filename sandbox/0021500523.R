@@ -7,9 +7,8 @@ library(jsonlite)
 # m[[6]][[1]] <- ball;  ball[[3]]=x, ball[[4]]=y, ball[[5]]=z
 
 
-#OUR BIGGEST CHANGES: fixing the quarter time error and changing methodology
-#so that we work backwards first finding the rim and contact point and then
-#looking 2 seconds before to find our release point.
+#NEW CHANGES: Looking at an average over three frames for vertical velocity and 
+#the same is also done for the vertical acceleration.
 
 
 file_path <- "~/Desktop/Matilda Rice/ARC_OPTIMIZATION/data/0021500523.json"
@@ -88,7 +87,7 @@ for (i in 1:nrow(current_shots)) {
   # Velocity calculation over three frames
   traj$vz_smooth <- c(NA, NA, NA,  diff(traj$z, lag = 3) / abs(diff(traj$clock, 
                                                                     lag = 3)))
-  
+  # Not using anymore
   dt <- abs(diff(traj$clock))
   
   #Acceleration calculation over three frames
