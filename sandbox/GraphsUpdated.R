@@ -7,8 +7,8 @@ library(jsonlite)
 # m[[6]][[1]] <- ball;  ball[[3]]=x, ball[[4]]=y, ball[[5]]=z
 
 
-#NEW CHANGES: Updated the graphs so one page shows shot, velocity, and 
-#acceleration graphs.
+#NEW CHANGES: Looking at an average over three frames for vertical velocity and 
+#the same is also done for the vertical acceleration.
 
 
 file_path <- "~/Desktop/Matilda Rice/ARC_OPTIMIZATION/data/0021500523.json"
@@ -30,7 +30,7 @@ rim_x      <- c(5.25, 88.75)
 
 final_results <- data.frame()
 
-pdf("0021500523.pdf", width = 8.5, height = 11)
+pdf("Three frames forward.pdf", width = 8.5, height = 11)
 par(mfrow = c(3, 1), mar = c(4, 4, 3, 2))
 acceleration_plots <- list()
 velocity_plots     <- list()   # NEW: stores vertical velocity data for each shot
@@ -81,20 +81,26 @@ for (i in 1:nrow(current_shots)) {
   rim_idx   <- rim_hits[1]
   rim_clock <- traj$clock[rim_idx]
   
-  # Velocity calculation original
-  traj$vz <- c(NA, diff(traj$z) / abs(diff(traj$clock)))
+  # Number of frames
+  n <- nrow(traj)
   
-  # Velocity calculation over three frames
-  traj$vz_smooth <- c(NA, NA, NA,  diff(traj$z, lag = 3) / abs(diff(traj$clock, 
-                                                                    lag = 3)))
-  # Not using anymore
-  dt <- abs(diff(traj$clock))
+  # Three-frame forward velocity
+  traj$vz_smooth <- rep(NA, n)
   
-  #Acceleration calculation over three frames
-  traj$az <- c(NA, NA,NA, NA, NA,NA, diff(traj$vz_smooth[-(1:3)], lag = 3) / 
-                 abs(diff(traj$clock[-(1:3)], lag = 3)))
+  for (j in 1:(n - 3)) {
+    dt <- abs(traj$clock[j + 3] - traj$clock[j])
+    traj$vz_smooth[j] <- (traj$z[j + 3] - traj$z[j]) / dt
+  }
   
-  # ACCELERATION POINTS
+  # Three-frame forward acceleration
+  traj$az <- rep(NA, n)
+  
+  for (j in 1:(n - 6)) {
+    dt <- abs(traj$clock[j + 3] - traj$clock[j])
+    traj$az[j] <- (traj$vz_smooth[j + 3] - traj$vz_smooth[j]) / dt
+  }
+  
+  # Acceleration points
   acceleration_plots[[length(acceleration_plots) + 1]] <- list(
     player = player_name,
     clock = traj$clock,
@@ -102,7 +108,7 @@ for (i in 1:nrow(current_shots)) {
     rim_clock = rim_clock
   )
   
-  # VELOCITY POINTS
+  # Velocity points
   velocity_plots[[length(velocity_plots) + 1]] <- list(
     player = player_name,
     clock = traj$clock,
