@@ -7,8 +7,8 @@ library(jsonlite)
 # m[[6]][[1]] <- ball;  ball[[3]]=x, ball[[4]]=y, ball[[5]]=z
 
 
-#NEW CHANGES: Looking at an average over three frames for vertical velocity and 
-#the same is also done for the vertical acceleration.
+#NEW CHANGES: Updated the graphs so one page shows shot, velocity, and 
+#acceleration graphs.
 
 
 file_path <- "~/Desktop/Matilda Rice/ARC_OPTIMIZATION/data/0021500523.json"
